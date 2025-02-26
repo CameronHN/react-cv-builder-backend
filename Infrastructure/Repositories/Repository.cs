@@ -24,13 +24,22 @@ namespace Infrastructure.Repositories
 
         public async Task AddRecordAsync(T entity)
         {
+            // Begin transaction
+            await using var transaction = await _dataContext.Database.BeginTransactionAsync();
+
             try
             {
                 await _dbSet.AddAsync(entity);
                 await _dataContext.SaveChangesAsync();
+
+                // Commit transaction
+                await transaction.CommitAsync();
             }
             catch (DbUpdateException dbUpdateEx)
             {
+                // Rollback transaction
+                await transaction.RollbackAsync();
+
                 throw new DbUpdateException("There was an error while attempting to add the record.", dbUpdateEx);
             }
             catch (Exception)
@@ -65,7 +74,7 @@ namespace Infrastructure.Repositories
         {
             try
             {
-                _dataContext.Update(entity);
+                _dbSet.Update(entity);
                 await _dataContext.SaveChangesAsync();
             }
             // Handle concurrency exceptions
@@ -77,9 +86,9 @@ namespace Infrastructure.Repositories
             {
                 throw new DbUpdateException("There was an error while attempting to update the record.", dbUpdateEx);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception("An error occurred while updating the record.");
+                throw new Exception($"An error occurred while updating the record: {ex.Message}", ex);
             }
         }
     }
