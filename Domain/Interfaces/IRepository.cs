@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Interfaces
+﻿namespace Domain.Interfaces
 {
     public interface IRepository<T> where T : class
-    {        
+    {
         Task AddRecordAsync(T entity);
 
         Task<T> GetRecordByIdAsync(int id);

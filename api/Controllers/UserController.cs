@@ -2,7 +2,6 @@
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -31,10 +30,6 @@ namespace api.Controllers
             {
                 await _userService.AddUserAsync(user);
                 return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-            }
-            catch (DbUpdateException ex)
-            {
-                return StatusCode(500, $"Database error: {ex.Message}");
             }
             catch (Exception ex)
             {
