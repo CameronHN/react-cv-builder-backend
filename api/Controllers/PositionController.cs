@@ -1,10 +1,7 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
-using Application.Services;
 using Domain.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -125,6 +122,24 @@ namespace api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = $"A server-side error occured while updating the position. Error message: {ex.Message}" });
+            }
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchPositionsByRole([FromQuery] string searchString)
+        {
+            try
+            {
+                var positions = await _positionService.SearchPositionsByRoleAsync(searchString);
+                return Ok(positions);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An error occurred while searching for positions.");
             }
         }
     }
