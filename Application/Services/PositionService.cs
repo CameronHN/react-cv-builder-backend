@@ -2,12 +2,6 @@
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Interfaces;
-using Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Services
 {
@@ -115,6 +109,26 @@ namespace Application.Services
             {
                 throw;
             }
+        }
+
+        public async Task<List<PositionAndResponsibilitiesDto>> SearchPositionsByRoleAsync(string searchString)
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+            {
+                throw new ArgumentException("Search string cannot be empty", nameof(searchString));
+            }
+
+            var positions = await _positionRepository.SearchPositionsByRoleAsync(searchString);
+
+            return positions.Select(p => new PositionAndResponsibilitiesDto
+            {
+                Role = p.Role,
+                StartDate = p.StartDate,
+                EndDate = p.EndDate,
+                PositionResponsibilities = p.Responsibilities
+                .Select(r => r.Responsibility)
+                .ToList()
+            }).ToList();
         }
     }
 }
