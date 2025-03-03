@@ -21,7 +21,7 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.EducationEntitiy", b =>
+            modelBuilder.Entity("Domain.Entities.EducationEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -31,33 +31,80 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("EndDate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<string>("FieldOfStudy")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("Institution")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("Major")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(20)");
 
-                    b.Property<int>("QualificationTypeId")
-                        .HasColumnType("int");
+                    b.Property<string>("Qualification")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("StartDate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Educations");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Education");
+                });
+
+            modelBuilder.Entity("Domain.Entities.HobbyEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("HobbyName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("HobbyTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HobbyTypeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Hobby");
+                });
+
+            modelBuilder.Entity("Domain.Entities.HobbyTypeEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("HobbyTypeName")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HobbyType");
                 });
 
             modelBuilder.Entity("Domain.Entities.PositionEntity", b =>
@@ -70,15 +117,15 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("EndDate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("StartDate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -87,7 +134,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Positions");
+                    b.ToTable("Position");
 
                     b.HasData(
                         new
@@ -109,7 +156,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 3,
-                            EndDate = "Present",
+                            EndDate = "",
                             Role = "Junior Software Engineer",
                             StartDate = "2022-01-02",
                             UserId = 1
@@ -125,7 +172,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 5,
-                            EndDate = "Present",
+                            EndDate = "",
                             Role = "Mechanical Mathematician",
                             StartDate = "2021-01-02",
                             UserId = 2
@@ -133,7 +180,7 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = 6,
-                            EndDate = "Present",
+                            EndDate = "",
                             Role = "Astrophysicist",
                             StartDate = "2020-01-01",
                             UserId = 3
@@ -153,14 +200,198 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Responsibility")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("PositionResponsibilities");
+                    b.HasIndex("PositionId");
+
+                    b.ToTable("PositionResponsibility");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            PositionId = 1,
+                            Responsibility = "Assist in software development tasks"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            PositionId = 1,
+                            Responsibility = "Write and maintain code"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            PositionId = 1,
+                            Responsibility = "Collaborate with team members"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            PositionId = 1,
+                            Responsibility = "Participate in code reviews"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            PositionId = 1,
+                            Responsibility = "Assist in testing and debugging"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            PositionId = 2,
+                            Responsibility = "Develop new software features"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            PositionId = 2,
+                            Responsibility = "Maintain existing codebase"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            PositionId = 2,
+                            Responsibility = "Collaborate with cross-functional teams"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            PositionId = 2,
+                            Responsibility = "Review and refactor code"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            PositionId = 2,
+                            Responsibility = "Document development processes"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            PositionId = 3,
+                            Responsibility = "Assist in software design"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            PositionId = 3,
+                            Responsibility = "Implement software solutions"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            PositionId = 3,
+                            Responsibility = "Collaborate with developers"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            PositionId = 3,
+                            Responsibility = "Participate in Agile processes"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            PositionId = 3,
+                            Responsibility = "Assist in system testing"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            PositionId = 4,
+                            Responsibility = "Develop software components"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            PositionId = 4,
+                            Responsibility = "Maintain technical documentation"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            PositionId = 4,
+                            Responsibility = "Work with QA team"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            PositionId = 4,
+                            Responsibility = "Review pull requests"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            PositionId = 4,
+                            Responsibility = "Fix software bugs"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            PositionId = 5,
+                            Responsibility = "Conduct mathematical analysis"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            PositionId = 5,
+                            Responsibility = "Develop mathematical models"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            PositionId = 5,
+                            Responsibility = "Collaborate with engineering teams"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            PositionId = 5,
+                            Responsibility = "Present findings and recommendations"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            PositionId = 5,
+                            Responsibility = "Document mathematical solutions"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            PositionId = 6,
+                            Responsibility = "Conduct astrophysical research"
+                        },
+                        new
+                        {
+                            Id = 27,
+                            PositionId = 6,
+                            Responsibility = "Analyze astronomical data"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            PositionId = 6,
+                            Responsibility = "Collaborate with research teams"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            PositionId = 6,
+                            Responsibility = "Present research findings"
+                        },
+                        new
+                        {
+                            Id = 30,
+                            PositionId = 6,
+                            Responsibility = "Publish research papers"
+                        });
                 });
 
-            modelBuilder.Entity("Domain.Entities.ProjectDescription", b =>
+            modelBuilder.Entity("Domain.Entities.ProfessionalStatementEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -168,16 +399,22 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
+                    b.Property<string>("ProfessionalObjective")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(255)");
 
-                    b.Property<int>("ProjectId")
+                    b.Property<string>("ProfessionalSummary")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProjectDescriptions");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ProfessionalStatement");
                 });
 
             modelBuilder.Entity("Domain.Entities.ProjectEntity", b =>
@@ -188,32 +425,39 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Client")
+                    b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(200)");
 
                     b.Property<string>("EndDate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<string>("GithubUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("ProjectName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("ProjectTypeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("StartDate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(10)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects");
+                    b.HasIndex("ProjectTypeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Project");
                 });
 
             modelBuilder.Entity("Domain.Entities.ProjectTechnologyEntity", b =>
@@ -232,10 +476,14 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProjectTechnologies");
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("TechnologyId");
+
+                    b.ToTable("ProjectTechnology");
                 });
 
-            modelBuilder.Entity("Domain.Entities.QualificationTypeEntity", b =>
+            modelBuilder.Entity("Domain.Entities.ProjectTypeEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -243,13 +491,13 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("ProjectTypeName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("QualificationTypes");
+                    b.ToTable("ProjectType");
                 });
 
             modelBuilder.Entity("Domain.Entities.SkillEntity", b =>
@@ -260,16 +508,18 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("SkillName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<int>("SkillTypeId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Skills");
+                    b.HasIndex("SkillTypeId");
+
+                    b.ToTable("Skill");
                 });
 
             modelBuilder.Entity("Domain.Entities.SkillTypeEntity", b =>
@@ -280,13 +530,13 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("SkillTypeName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("SkillTypes");
+                    b.ToTable("SkillType");
                 });
 
             modelBuilder.Entity("Domain.Entities.SocialMediaEntity", b =>
@@ -297,20 +547,22 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("SocialMediaName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
-                    b.Property<string>("Url")
+                    b.Property<string>("SocialMediaUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("SocialMedias");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SocialMedia");
                 });
 
             modelBuilder.Entity("Domain.Entities.TechnologyEntity", b =>
@@ -321,13 +573,13 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("TechnologyName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Technologies");
+                    b.ToTable("Technology");
                 });
 
             modelBuilder.Entity("Domain.Entities.UserEntity", b =>
@@ -340,31 +592,32 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("MiddleName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("varchar(12)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            Email = "joh@example.com",
+                            Email = "john@example.com",
                             FirstName = "John",
                             LastName = "Doe",
                             MiddleName = "Henry",
@@ -415,7 +668,41 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserSkills");
+                    b.HasIndex("SkillId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSkill");
+                });
+
+            modelBuilder.Entity("Domain.Entities.EducationEntity", b =>
+                {
+                    b.HasOne("Domain.Entities.UserEntity", "User")
+                        .WithMany("Educations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.HobbyEntity", b =>
+                {
+                    b.HasOne("Domain.Entities.HobbyTypeEntity", "HobbyType")
+                        .WithMany("Hobbies")
+                        .HasForeignKey("HobbyTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.UserEntity", "User")
+                        .WithMany("Hobbies")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HobbyType");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.PositionEntity", b =>
@@ -429,9 +716,132 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.PositionResponsibilityEntity", b =>
+                {
+                    b.HasOne("Domain.Entities.PositionEntity", "Position")
+                        .WithMany("Responsibilities")
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Position");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ProfessionalStatementEntity", b =>
+                {
+                    b.HasOne("Domain.Entities.UserEntity", "User")
+                        .WithMany("ProfessionalStatements")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ProjectEntity", b =>
+                {
+                    b.HasOne("Domain.Entities.ProjectTypeEntity", "ProjectType")
+                        .WithMany()
+                        .HasForeignKey("ProjectTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.UserEntity", "User")
+                        .WithMany("Projects")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProjectType");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ProjectTechnologyEntity", b =>
+                {
+                    b.HasOne("Domain.Entities.ProjectEntity", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.TechnologyEntity", "Technology")
+                        .WithMany()
+                        .HasForeignKey("TechnologyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("Technology");
+                });
+
+            modelBuilder.Entity("Domain.Entities.SkillEntity", b =>
+                {
+                    b.HasOne("Domain.Entities.SkillTypeEntity", "SkillType")
+                        .WithMany()
+                        .HasForeignKey("SkillTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SkillType");
+                });
+
+            modelBuilder.Entity("Domain.Entities.SocialMediaEntity", b =>
+                {
+                    b.HasOne("Domain.Entities.UserEntity", "User")
+                        .WithMany("SocialMedias")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.UserSkillEntity", b =>
+                {
+                    b.HasOne("Domain.Entities.SkillEntity", "Skill")
+                        .WithMany()
+                        .HasForeignKey("SkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.UserEntity", "User")
+                        .WithMany("UserSkills")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Skill");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.HobbyTypeEntity", b =>
+                {
+                    b.Navigation("Hobbies");
+                });
+
+            modelBuilder.Entity("Domain.Entities.PositionEntity", b =>
+                {
+                    b.Navigation("Responsibilities");
+                });
+
             modelBuilder.Entity("Domain.Entities.UserEntity", b =>
                 {
+                    b.Navigation("Educations");
+
+                    b.Navigation("Hobbies");
+
                     b.Navigation("Positions");
+
+                    b.Navigation("ProfessionalStatements");
+
+                    b.Navigation("Projects");
+
+                    b.Navigation("SocialMedias");
+
+                    b.Navigation("UserSkills");
                 });
 #pragma warning restore 612, 618
         }
