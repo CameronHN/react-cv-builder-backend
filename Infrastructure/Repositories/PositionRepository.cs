@@ -2,11 +2,6 @@
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -19,12 +14,27 @@ namespace Infrastructure.Repositories
             _dataContext = dataContext;
         }
 
-        public Task<List<PositionEntity>> GetPositionsByUserIdAsync(int userId)
+        public async Task<List<PositionEntity>> GetPositionsByUserIdAsync(int userId)
         {
             try
             {
-                return _dataContext.Positions
+                return await _dataContext.Positions
                     .Where(p => p.UserId == userId)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<PositionEntity>> SearchPositionsByRoleAsync(string searchString)
+        {
+            try
+            {
+                return await _dataContext.Positions
+                    .Where(p => p.Role.Contains(searchString))
+                    .Include(p => p.Responsibilities)
                     .ToListAsync();
             }
             catch (Exception ex)
