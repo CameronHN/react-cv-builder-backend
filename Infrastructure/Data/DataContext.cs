@@ -1,10 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Entities;
+﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
@@ -14,7 +9,7 @@ namespace Infrastructure.Data
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        public DbSet<EducationEntitiy> Educations { get; set; }
+        public DbSet<EducationEntity> Educations { get; set; }
 
         public DbSet<PositionEntity> Positions { get; set; }
 
@@ -22,11 +17,7 @@ namespace Infrastructure.Data
 
         public DbSet<ProjectEntity> Projects { get; set; }
 
-        public DbSet<ProjectDescription> ProjectDescriptions { get; set; }
-
         public DbSet<ProjectTechnologyEntity> ProjectTechnologies { get; set; }
-
-        public DbSet<QualificationTypeEntity> QualificationTypes { get; set; }
 
         public DbSet<SkillEntity> Skills { get; set; }
 
@@ -49,14 +40,17 @@ namespace Infrastructure.Data
             // ===== Relationships ======
             // ==========================
 
-            // One to many relationship
-            // A user can have many positions
             modelBuilder.Entity<PositionEntity>()
                 .HasOne(p => p.User)
                 .WithMany(u => u.Positions)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<PositionResponsibilityEntity>()
+                .HasOne(pr => pr.Position)
+                .WithMany(p => p.Responsibilities)
+                .HasForeignKey(pr => pr.PositionId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // ==========================
             // ======= Seed Data ========
@@ -69,7 +63,7 @@ namespace Infrastructure.Data
                     FirstName = "John",
                     MiddleName = "Henry",
                     LastName = "Doe",
-                    Email = "joh@example.com"
+                    Email = "john@example.com"
                 },
                 new UserEntity
                 {
@@ -144,6 +138,45 @@ namespace Infrastructure.Data
                     UserId = 3
                 }
             );
+
+            modelBuilder.Entity<PositionResponsibilityEntity>().HasData(
+                new PositionResponsibilityEntity { Id = 1, PositionId = 1, Responsibility = "Assist in software development tasks" },
+                new PositionResponsibilityEntity { Id = 2, PositionId = 1, Responsibility = "Write and maintain code" },
+                new PositionResponsibilityEntity { Id = 3, PositionId = 1, Responsibility = "Collaborate with team members" },
+                new PositionResponsibilityEntity { Id = 4, PositionId = 1, Responsibility = "Participate in code reviews" },
+                new PositionResponsibilityEntity { Id = 5, PositionId = 1, Responsibility = "Assist in testing and debugging" },
+
+                new PositionResponsibilityEntity { Id = 6, PositionId = 2, Responsibility = "Develop new software features" },
+                new PositionResponsibilityEntity { Id = 7, PositionId = 2, Responsibility = "Maintain existing codebase" },
+                new PositionResponsibilityEntity { Id = 8, PositionId = 2, Responsibility = "Collaborate with cross-functional teams" },
+                new PositionResponsibilityEntity { Id = 9, PositionId = 2, Responsibility = "Review and refactor code" },
+                new PositionResponsibilityEntity { Id = 10, PositionId = 2, Responsibility = "Document development processes" },
+
+                new PositionResponsibilityEntity { Id = 11, PositionId = 3, Responsibility = "Assist in software design" },
+                new PositionResponsibilityEntity { Id = 12, PositionId = 3, Responsibility = "Implement software solutions" },
+                new PositionResponsibilityEntity { Id = 13, PositionId = 3, Responsibility = "Collaborate with developers" },
+                new PositionResponsibilityEntity { Id = 14, PositionId = 3, Responsibility = "Participate in Agile processes" },
+                new PositionResponsibilityEntity { Id = 15, PositionId = 3, Responsibility = "Assist in system testing" },
+
+                new PositionResponsibilityEntity { Id = 16, PositionId = 4, Responsibility = "Develop software components" },
+                new PositionResponsibilityEntity { Id = 17, PositionId = 4, Responsibility = "Maintain technical documentation" },
+                new PositionResponsibilityEntity { Id = 18, PositionId = 4, Responsibility = "Work with QA team" },
+                new PositionResponsibilityEntity { Id = 19, PositionId = 4, Responsibility = "Review pull requests" },
+                new PositionResponsibilityEntity { Id = 20, PositionId = 4, Responsibility = "Fix software bugs" },
+
+                new PositionResponsibilityEntity { Id = 21, PositionId = 5, Responsibility = "Conduct mathematical analysis" },
+                new PositionResponsibilityEntity { Id = 22, PositionId = 5, Responsibility = "Develop mathematical models" },
+                new PositionResponsibilityEntity { Id = 23, PositionId = 5, Responsibility = "Collaborate with engineering teams" },
+                new PositionResponsibilityEntity { Id = 24, PositionId = 5, Responsibility = "Present findings and recommendations" },
+                new PositionResponsibilityEntity { Id = 25, PositionId = 5, Responsibility = "Document mathematical solutions" },
+
+                new PositionResponsibilityEntity { Id = 26, PositionId = 6, Responsibility = "Conduct astrophysical research" },
+                new PositionResponsibilityEntity { Id = 27, PositionId = 6, Responsibility = "Analyze astronomical data" },
+                new PositionResponsibilityEntity { Id = 28, PositionId = 6, Responsibility = "Collaborate with research teams" },
+                new PositionResponsibilityEntity { Id = 29, PositionId = 6, Responsibility = "Present research findings" },
+                new PositionResponsibilityEntity { Id = 30, PositionId = 6, Responsibility = "Publish research papers" }
+            );
+
         }
 
 
