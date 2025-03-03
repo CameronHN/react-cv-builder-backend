@@ -1,10 +1,5 @@
 ﻿using Application.DTOs;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
@@ -21,6 +16,8 @@ namespace Application.Interfaces
         Task DeletePositionAsync(int id);
 
         Task<List<PositionDto>> GetPositionsByUserIdAsync(int userId);
+
+        Task<List<PositionAndResponsibilitiesDto>> SearchPositionsByRoleAsync(string searchString);
 
     }
 }
