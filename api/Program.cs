@@ -2,8 +2,8 @@ using Application.Interfaces;
 using Application.Services;
 using Domain.Interfaces;
 using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,12 +32,14 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 // Register repositories for custom methods
 builder.Services.AddScoped<IPositionRepository, PositionRepository>();
+builder.Services.AddScoped<IPositionResponsibilityRepository, PositionResponsibilityRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
+builder.Services.AddScoped<IPositionResponsibilityService, PositionResponsibilityService>();
 
 var app = builder.Build();
 
