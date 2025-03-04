@@ -3,11 +3,12 @@ using Application.Services;
 using Domain.Entities;
 using Domain.Interfaces;
 using Moq;
+using System.ComponentModel.DataAnnotations;
 
 namespace Tests;
 
 [TestFixture]
-public class UserInfrastructureTest
+public class UserServiceTest
 {
     private Mock<IRepository<UserEntity>> _mockUserRepository = null!;
     private UserService _userService = null!;
@@ -27,6 +28,20 @@ public class UserInfrastructureTest
         await _userService.AddUserAsync(user);
 
         _mockUserRepository.Verify(repo => repo.AddRecordAsync(user), Times.Once);
+    }
+
+    [Test]
+    public void AddUserAsync_InvalidEmailProvided_ShouldThrowValidationException()
+    {
+        var user = new UserEntity { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doeexample.com" };
+
+        var validationContext = new ValidationContext(user);
+        var validationResults = new List<ValidationResult>();
+
+        var isValid = Validator.TryValidateObject(user, validationContext, validationResults, true);
+
+        Assert.That(isValid, Is.False);
+        Assert.That(validationResults, Has.Some.Matches<ValidationResult>(v => v.ErrorMessage == "The Email field is not a valid e-mail address."));
     }
 
     [Test]
