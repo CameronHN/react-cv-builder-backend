@@ -11,7 +11,6 @@ namespace Tests;
 [TestFixture]
 public class UserControllerTest
 {
-
     private Mock<IUserService> _mockUserService = null!;
     private UserController _userController = null!;
 
@@ -81,10 +80,10 @@ public class UserControllerTest
             Email = "johndoe@example.com"
         };
 
-        _mockUserService.Setup(service => service.GetUserByIdAsync(user.Id)).ReturnsAsync(user);
+        _mockUserService.Setup(service => service.GetUserByIdAsync(1)).ReturnsAsync(user);
 
         // Act
-        var result = await _userController.GetUser(user.Id);
+        var result = await _userController.GetUser(1);
 
         // Assert
         result.Result.Should().BeOfType<OkObjectResult>().Which.StatusCode.Should().Be(200);
