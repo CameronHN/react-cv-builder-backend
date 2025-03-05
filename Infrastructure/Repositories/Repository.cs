@@ -1,11 +1,6 @@
 ﻿using Domain.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -13,7 +8,6 @@ namespace Infrastructure.Repositories
     {
         private readonly DataContext _dataContext;
 
-        // Access to the corresponding table for the entity
         private readonly DbSet<T> _dbSet;
 
         public Repository(DataContext dataContext)
@@ -24,22 +18,13 @@ namespace Infrastructure.Repositories
 
         public async Task AddRecordAsync(T entity)
         {
-            // Begin transaction
-            await using var transaction = await _dataContext.Database.BeginTransactionAsync();
-
             try
             {
                 await _dbSet.AddAsync(entity);
                 await _dataContext.SaveChangesAsync();
-
-                // Commit transaction
-                await transaction.CommitAsync();
             }
             catch (DbUpdateException dbUpdateEx)
             {
-                // Rollback transaction
-                await transaction.RollbackAsync();
-
                 throw new DbUpdateException("There was an error while attempting to add the record.", dbUpdateEx);
             }
             catch (Exception)
@@ -67,7 +52,12 @@ namespace Infrastructure.Repositories
 
         public async Task<T> GetRecordByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            var entity = await _dbSet.FindAsync(id);
+            if (entity == null)
+            {
+                throw new KeyNotFoundException($"Record with id {id} not found.");
+            }
+            return entity;
         }
 
         public async Task UpdateRecordAsync(T entity)
