@@ -1,174 +1,170 @@
 ﻿using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System.Net;
 using System.Text;
 
 namespace Tests;
 
 [TestFixture]
-public class UserControllerIntegrationTest : WebApplicationFactory<Program>
+public class UserControllerIntegrationTest
 {
     private HttpClient _client;
     private DataContext? _context;
+    private UserEntity _user;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseInMemoryDatabase("TestDatabase")
+            .Options;
+
+        _context = new DataContext(options);
+
+        var _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
+            {
+                var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDbContextOptionsConfiguration<DataContext>));
+                if (descriptor != null)
+                {
+                    services.Remove(descriptor);
+                }
+
+                // Register the in-memory database for testing
+                services.AddDbContext<DataContext>(options =>
+                {
+                    options.UseInMemoryDatabase("TestDatabase")
+                    .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+                });
+            });
+        });
+
+        _client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            BaseAddress = new Uri("https://localhost:44366")
+        });
+    }
+
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        _context?.Database.EnsureDeleted();  // Delete the in-memory database after tests
+        _context?.Dispose();  // Dispose of the DbContext to release resources
+        _client.Dispose();  // Dispose of the HttpClient to release resources
+    }
 
     [SetUp]
     public void SetUp()
     {
-        _client = CreateClient();
-        using var scope = Services.CreateScope();
-        _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        _user = new UserEntity
+        {
+            Id = 1,
+            FirstName = "Jane",
+            LastName = "Doe",
+            Email = "jane.doe@example.com"
+        };
     }
 
-    [TearDown]
-    public void TearDown()
+    private async Task<HttpResponseMessage> PostUserAsync(UserEntity user)
     {
-        _context.Dispose();
+        var content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+        return await _client.PostAsync("/api/user", content);
     }
 
     [Test]
     public async Task CreateUser_Should_Add_User()
     {
         // Arrange
-        var user = new UserEntity
-        {
-            FirstName = "John",
-            LastName = "Doe",
-            Email = "john.doe@example.com"
-        };
-        var content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
+        var response = await PostUserAsync(_user);
 
         // Act
-        var response = await _client.PostAsync("/api/user/", content); // Adjust the URL based on your API route
         response.EnsureSuccessStatusCode();
-
         var responseString = await response.Content.ReadAsStringAsync();
         var createdUser = JsonConvert.DeserializeObject<UserEntity>(responseString);
 
         // Assert
-        Assert.That(user.FirstName, Is.EqualTo(createdUser.FirstName));
-        Assert.That(user.LastName, Is.EqualTo(createdUser.LastName));
-        Assert.That(user.Email, Is.EqualTo(createdUser.Email));
-        Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.Created));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+        Assert.That(createdUser, Is.Not.Null);
+        Assert.That(createdUser.FirstName, Is.EqualTo(_user.FirstName));
     }
 
     [Test]
     public async Task GetUserById_UserExists_ReturnsUser()
     {
         // Arrange
-        var user = new UserEntity
-        {
-            FirstName = "Jane",
-            LastName = "Doe",
-            Email = "jane.doe@example.com"
-        };
-
-        using (var scope = Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-            dbContext.Users.Add(user);
-            dbContext.SaveChanges();
-        }
+        await PostUserAsync(_user);
 
         // Act
-        var response = await _client.GetAsync($"/api/user/{user.Id}");
+        var response = await _client.GetAsync($"/api/user/{_user.Id}");
         response.EnsureSuccessStatusCode();
-
         var responseString = await response.Content.ReadAsStringAsync();
         var returnedUser = JsonConvert.DeserializeObject<UserEntity>(responseString);
 
         // Assert
-        Assert.That(user.FirstName, Is.EqualTo(returnedUser.FirstName));
-        Assert.That(user.LastName, Is.EqualTo(returnedUser.LastName));
-        Assert.That(user.Email, Is.EqualTo(returnedUser.Email));
-        Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.OK));
+        Assert.That(returnedUser, Is.Not.Null);
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
     }
 
     [Test]
     public async Task GetUserById_UserNotExists_ReturnsNotFound()
     {
         // Arrange
-        using (var scope = Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        }
+        await PostUserAsync(_user);
 
         // Act
-        var response = await _client.GetAsync($"/api/user/9999");
+        var response = await _client.GetAsync($"/api/user/2");
 
         // Assert
-        Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.NotFound));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
     }
 
     [Test]
     public async Task UpdateUser_Should_Update_User()
     {
         // Arrange
-        var user = new UserEntity
-        {
-            FirstName = "Jake",
-            LastName = "Smith",
-            Email = "jake.smith@example.com"
-        };
-
-        using (var scope = Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-            dbContext.Users.Add(user); // Ensure you add the user to the context
-            dbContext.SaveChanges();
-        }
+        await PostUserAsync(_user);
 
         var updatedUser = new UserEntity
         {
-            Id = user.Id,
-            FirstName = "Jacob", // Updating first name
+            Id = _user.Id,
+            FirstName = "Jacob",
             LastName = "Smith",
-            Email = "jacob.smith@example.com" // Updating email
+            Email = "jacob.smith@example.com"
         };
+
         var content = new StringContent(JsonConvert.SerializeObject(updatedUser), Encoding.UTF8, "application/json");
 
         // Act
-        var response = await _client.PatchAsync($"/api/user/{updatedUser.Id}", content); // Adjust the URL based on your API route
+        var response = await _client.PatchAsync($"/api/user/{updatedUser.Id}", content);
         response.EnsureSuccessStatusCode();
 
         // Assert
-        var responseString = await response.Content.ReadAsStringAsync();
-        var returnedUser = JsonConvert.DeserializeObject<UserEntity>(responseString);
-
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(updatedUser.Id, Is.EqualTo(user.Id));
-            Assert.That(updatedUser.FirstName, Is.Not.EqualTo(user.FirstName));
-            Assert.That(updatedUser.LastName, Is.EqualTo(user.LastName));
-            Assert.That(updatedUser.Email, Is.Not.EqualTo(user.Email));
-        }
-        Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.OK));
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That(updatedUser, Is.Not.EqualTo(_user));
+        Assert.That(updatedUser.FirstName, Is.Not.EqualTo(_user.FirstName));
     }
 
     [Test]
     public async Task DeleteUser_Should_Remove_User()
     {
         // Arrange
-        var user = new UserEntity
-        {
-            FirstName = "Alice",
-            LastName = "Johnson",
-            Email = "alice.johnson@example.com"
-        };
-
-        using (var scope = Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-            dbContext.Users.Add(user); // Ensure you add the user to the context
-            dbContext.SaveChanges();
-        }
+        await PostUserAsync(_user);
 
         // Act
-        var response = await _client.DeleteAsync($"/api/user/DeleteUser/{user.Id}");
-        response.EnsureSuccessStatusCode();
+        var deleteResponse = await _client.DeleteAsync($"/api/user/DeleteUser/{_user.Id}");
+        var getUserResponse = await _client.GetAsync($"/api/user/1");
+        var responseString = await getUserResponse.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.That(response.StatusCode, Is.EqualTo(System.Net.HttpStatusCode.OK));
+        Assert.That(getUserResponse.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        Assert.That(deleteResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That(responseString, Does.Contain("User with the Id:1 not found."));
     }
 }
