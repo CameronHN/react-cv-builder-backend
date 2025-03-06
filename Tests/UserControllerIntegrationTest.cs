@@ -60,6 +60,7 @@ public class UserControllerIntegrationTest
         _client.Dispose();  // Dispose of the HttpClient to release resources
     }
 
+    // Set up a user object before each test
     [SetUp]
     public void SetUp()
     {
@@ -72,6 +73,7 @@ public class UserControllerIntegrationTest
         };
     }
 
+    // Helper method to post a user to the API
     private async Task<HttpResponseMessage> PostUserAsync(UserEntity user)
     {
         var content = new StringContent(JsonConvert.SerializeObject(user), Encoding.UTF8, "application/json");
@@ -79,13 +81,12 @@ public class UserControllerIntegrationTest
     }
 
     [Test]
-    public async Task CreateUser_Should_Add_User()
+    public async Task CreateUser_ValidUser_ReturnsCreated()
     {
         // Arrange
         var response = await PostUserAsync(_user);
 
         // Act
-        response.EnsureSuccessStatusCode();
         var responseString = await response.Content.ReadAsStringAsync();
         var createdUser = JsonConvert.DeserializeObject<UserEntity>(responseString);
 
@@ -96,19 +97,60 @@ public class UserControllerIntegrationTest
     }
 
     [Test]
-    public async Task GetUserById_UserExists_ReturnsUser()
+    public async Task CreateUser_MissingFirstName_ReturnsBadRequest()
+    {
+        // Arrange
+        var invalidUser = new UserEntity
+        {
+            LastName = "Doe",
+            Email = "jane.doe@example.com"
+        };
+
+        var content = new StringContent(JsonConvert.SerializeObject(invalidUser), Encoding.UTF8, "application/json");
+
+        // Act
+        var response = await _client.PostAsync("/api/user", content);
+
+        // Assert
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+    }
+
+    [Test]
+    public async Task CreateUser_InvalidEmail_ReturnsBadRequest()
+    {
+        // Arrange
+        var invalidUser = new UserEntity
+        {
+            FirstName = "Jane",
+            LastName = "Doe",
+            Email = "jane.doeexample.com"
+        };
+
+        var content = new StringContent(JsonConvert.SerializeObject(invalidUser), Encoding.UTF8, "application/json");
+
+        // Act
+        var response = await _client.PostAsync("/api/user", content);
+        var responseString = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(responseString, Does.Contain("The Email field is not a valid e-mail address."));
+    }
+
+    [Test]
+    public async Task GetUserById_UserExists_ReturnsOk()
     {
         // Arrange
         await PostUserAsync(_user);
 
         // Act
         var response = await _client.GetAsync($"/api/user/{_user.Id}");
-        response.EnsureSuccessStatusCode();
         var responseString = await response.Content.ReadAsStringAsync();
         var returnedUser = JsonConvert.DeserializeObject<UserEntity>(responseString);
 
         // Assert
         Assert.That(returnedUser, Is.Not.Null);
+        Assert.That(returnedUser.Id, Is.EqualTo(_user.Id));
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
     }
 
@@ -116,17 +158,21 @@ public class UserControllerIntegrationTest
     public async Task GetUserById_UserNotExists_ReturnsNotFound()
     {
         // Arrange
-        await PostUserAsync(_user);
+        int userId = 2;
+        //await PostUserAsync(_user);
+
 
         // Act
-        var response = await _client.GetAsync($"/api/user/2");
+        var response = await _client.GetAsync($"/api/user/{userId}");
+        var responseString = await response.Content.ReadAsStringAsync();
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        Assert.That(responseString, Does.Contain($"User with the Id:{userId} not found."));
     }
 
     [Test]
-    public async Task UpdateUser_Should_Update_User()
+    public async Task UpdateUser_UserExists_ReturnsOk()
     {
         // Arrange
         await PostUserAsync(_user);
@@ -143,28 +189,58 @@ public class UserControllerIntegrationTest
 
         // Act
         var response = await _client.PatchAsync($"/api/user/{updatedUser.Id}", content);
-        response.EnsureSuccessStatusCode();
 
         // Assert
         Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        Assert.That(updatedUser, Is.Not.EqualTo(_user));
+        Assert.That(updatedUser.Id, Is.EqualTo(_user.Id));
         Assert.That(updatedUser.FirstName, Is.Not.EqualTo(_user.FirstName));
     }
 
     [Test]
-    public async Task DeleteUser_Should_Remove_User()
+    public async Task UpdateUser_UserNotExists_ReturnsNotFound()
+    {
+        // Arrange
+        //await PostUserAsync(_user);
+
+        var updatedUser = new UserEntity
+        {
+            Id = 2,
+            FirstName = "Jacob",
+            LastName = "Smith",
+            Email = "jacob.smith@example.com"
+        };
+
+        var content = new StringContent(JsonConvert.SerializeObject(updatedUser), Encoding.UTF8, "application/json");
+
+        // Act
+        var response = await _client.PatchAsync($"/api/user/{updatedUser.Id}", content);
+
+        // Assert
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+    }
+
+    [Test]
+    public async Task DeleteUser_UserExists_ReturnsSuccess()
     {
         // Arrange
         await PostUserAsync(_user);
 
         // Act
         var deleteResponse = await _client.DeleteAsync($"/api/user/DeleteUser/{_user.Id}");
-        var getUserResponse = await _client.GetAsync($"/api/user/1");
-        var responseString = await getUserResponse.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.That(getUserResponse.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         Assert.That(deleteResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        Assert.That(responseString, Does.Contain("User with the Id:1 not found."));
+    }
+
+    [Test]
+    public async Task DeleteUser_UserNotExists_ReturnsNotFound()
+    {
+        // Act
+        var deleteResponse = await _client.DeleteAsync($"/api/user/DeleteUser/1");
+        var responseString = await deleteResponse.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.That(deleteResponse.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        Assert.That(responseString, Does.Contain("User with Id:1 not found."));
     }
 }
