@@ -176,17 +176,15 @@ namespace Infrastructure.Data
                 new PositionResponsibilityEntity { Id = 29, PositionId = 6, Responsibility = "Present research findings" },
                 new PositionResponsibilityEntity { Id = 30, PositionId = 6, Responsibility = "Publish research papers" }
             );
-
         }
 
-
-        // Override to configure the database provider
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Data source=(localdb)\\localdb;Initial catalog=CvDb;Trusted_Connection=True;TrustServerCertificate=True;");
-            }
-        }
+        //// Override to configure the database provider
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    if (!optionsBuilder.IsConfigured)
+        //    {
+        //        optionsBuilder.UseSqlServer("Data source=(localdb)\\localdb;Initial catalog=CvDb;Trusted_Connection=True;TrustServerCertificate=True;");
+        //    }
+        //}
     }
 }
