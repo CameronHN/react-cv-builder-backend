@@ -33,7 +33,7 @@ namespace Infrastructure.Repositories
             try
             {
                 return await _dataContext.Positions
-                    .Where(p => p.Role.Contains(searchString))
+                    .Where(p => p.Role.ToLower().Contains(searchString.ToLower()))
                     .Include(p => p.Responsibilities)
                     .ToListAsync();
             }
