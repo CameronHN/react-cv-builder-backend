@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using FluentAssertions;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -91,9 +92,9 @@ public class UserControllerIntegrationTest
         var createdUser = JsonConvert.DeserializeObject<UserEntity>(responseString);
 
         // Assert
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
-        Assert.That(createdUser, Is.Not.Null);
-        Assert.That(createdUser.FirstName, Is.EqualTo(_user.FirstName));
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        createdUser.Should().NotBeNull();
+        createdUser.FirstName.Should().Be(_user.FirstName);
     }
 
     [Test]
@@ -112,7 +113,8 @@ public class UserControllerIntegrationTest
         var response = await _client.PostAsync("/api/user", content);
 
         // Assert
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        response.Content.ReadAsStringAsync().Result.Should().Contain("The FirstName field is required.");
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Test]
@@ -133,8 +135,8 @@ public class UserControllerIntegrationTest
         var responseString = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-        Assert.That(responseString, Does.Contain("The Email field is not a valid e-mail address."));
+        responseString.Should().Contain("The Email field is not a valid e-mail address.");
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
     [Test]
@@ -149,9 +151,9 @@ public class UserControllerIntegrationTest
         var returnedUser = JsonConvert.DeserializeObject<UserEntity>(responseString);
 
         // Assert
-        Assert.That(returnedUser, Is.Not.Null);
-        Assert.That(returnedUser.Id, Is.EqualTo(_user.Id));
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        returnedUser.Should().NotBeNull();
+        returnedUser.Id.Should().Be(_user.Id);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Test]
@@ -161,14 +163,13 @@ public class UserControllerIntegrationTest
         int userId = 2;
         //await PostUserAsync(_user);
 
-
         // Act
         var response = await _client.GetAsync($"/api/user/{userId}");
         var responseString = await response.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
-        Assert.That(responseString, Does.Contain($"User with the Id:{userId} not found."));
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        responseString.Should().Contain($"User with the Id:{userId} not found.");
     }
 
     [Test]
@@ -191,9 +192,9 @@ public class UserControllerIntegrationTest
         var response = await _client.PatchAsync($"/api/user/{updatedUser.Id}", content);
 
         // Assert
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-        Assert.That(updatedUser.Id, Is.EqualTo(_user.Id));
-        Assert.That(updatedUser.FirstName, Is.Not.EqualTo(_user.FirstName));
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        updatedUser.Id.Should().Be(_user.Id);
+        updatedUser.FirstName.Should().NotBe(_user.FirstName);
     }
 
     [Test]
@@ -216,7 +217,7 @@ public class UserControllerIntegrationTest
         var response = await _client.PatchAsync($"/api/user/{updatedUser.Id}", content);
 
         // Assert
-        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Test]
@@ -229,7 +230,7 @@ public class UserControllerIntegrationTest
         var deleteResponse = await _client.DeleteAsync($"/api/user/DeleteUser/{_user.Id}");
 
         // Assert
-        Assert.That(deleteResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        deleteResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Test]
@@ -240,7 +241,7 @@ public class UserControllerIntegrationTest
         var responseString = await deleteResponse.Content.ReadAsStringAsync();
 
         // Assert
-        Assert.That(deleteResponse.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
-        Assert.That(responseString, Does.Contain("User with Id:1 not found."));
+        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        responseString.Should().Contain("User with Id:1 not found.");
     }
 }
