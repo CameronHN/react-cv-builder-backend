@@ -2,6 +2,7 @@
 using Application.Services;
 using Domain.Entities;
 using Domain.Interfaces;
+using FluentAssertions;
 using Moq;
 using System.ComponentModel.DataAnnotations;
 
@@ -52,8 +53,8 @@ public class UserServiceTest
 
         // Assert
         // Checking that the validation failed and the correct validation error message is present
-        Assert.That(isValid, Is.False);
-        Assert.That(validationResults, Has.Some.Matches<ValidationResult>(v => v.ErrorMessage == "The Email field is not a valid e-mail address."));
+        isValid.Should().BeFalse();
+        validationResults.Should().ContainSingle(v => v.ErrorMessage == "The Email field is not a valid e-mail address.");
     }
 
     [Test]
@@ -76,7 +77,7 @@ public class UserServiceTest
 
         // Assert
         // Verifying the result contains the expected number of users
-        Assert.That(result.Count(), Is.EqualTo(2));
+        result.Count().Should().Be(2);
     }
 
     [Test]
@@ -95,7 +96,7 @@ public class UserServiceTest
 
         // Assert
         // Verifying the result matches the expected user
-        Assert.That(result, Is.EqualTo(user));
+        result.Should().Be(user);
     }
 
     [Test]
