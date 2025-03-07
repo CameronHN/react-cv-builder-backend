@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using FluentAssertions;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -60,7 +61,7 @@ namespace Tests
             await _repository.AddRecordAsync(user);
 
             // Assert
-            Assert.That(mockUserList.Contains(user), Is.True);
+            mockUserList.Contains(user).Should().BeTrue();
             _mockDbSet.Verify(dbSet => dbSet.AddAsync(It.IsAny<UserEntity>(), default), Times.Once);
             _mockContext.Verify(c => c.SaveChangesAsync(default), Times.Once);
         }
@@ -84,8 +85,8 @@ namespace Tests
             var result = await _repository.GetRecordByIdAsync(user.Id);
 
             // Assert
-            Assert.That(user, Is.EqualTo(result));
-            Assert.That(result, Is.Not.Null);
+            result.Should().Be(user);
+            result.Should().NotBeNull();
             _mockDbSet.Verify(dbSet => dbSet.FindAsync(It.IsAny<int>()), Times.Once);
         }
 
@@ -134,7 +135,7 @@ namespace Tests
             var result = await _repository.DeleteRecordAsync(user.Id);
 
             // Assert
-            Assert.That(result, Is.True);
+            result.Should().BeTrue();
             _mockDbSet.Verify(dbSet => dbSet.FindAsync(user.Id), Times.Once);
             _mockContext.Verify(c => c.Remove(It.Is<UserEntity>(u => u.Id == user.Id)), Times.Once);
             _mockContext.Verify(c => c.SaveChangesAsync(default), Times.Once);
