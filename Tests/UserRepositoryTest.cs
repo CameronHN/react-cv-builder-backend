@@ -15,7 +15,6 @@ namespace Tests
         // Mock DataContext to simulate interaction with the actual database context
         private Mock<DataContext> _mockContext;
 
-        // Repository instance that will be tested
         private Repository<UserEntity> _repository;
 
         // Setup method executed before each test
@@ -28,7 +27,7 @@ namespace Tests
             // Creating a mock instance of the DataContext which will simulate the actual database context
             _mockContext = new Mock<DataContext>();
 
-            // Setting up the mock context so that when the Set<UserEntity>() method is called, it returns the mocked DbSet
+            // Set up the mock context
             _mockContext.Setup(c => c.Set<UserEntity>()).Returns(_mockDbSet.Object);
 
             // Setting up the SaveChangesAsync method of the context to return a successful result (1)
@@ -39,9 +38,8 @@ namespace Tests
             _repository = new Repository<UserEntity>(_mockContext.Object);
         }
 
-        // Test method that verifies if a UserEntity is added correctly
         [Test]
-        public async Task AddRecordAsync_Should_Add_UserEntity()
+        public async Task AddRecordAsync_ValidUser_VerifyUserAdded()
         {
             // Arrange
             var user = new UserEntity
@@ -68,7 +66,7 @@ namespace Tests
         }
 
         [Test]
-        public async Task GetUserById_UserFound_ReturnsUserExists()
+        public async Task GetUserById_UserExists_VerifyUserExist()
         {
             // Arrange
             var user = new UserEntity
@@ -92,7 +90,7 @@ namespace Tests
         }
 
         [Test]
-        public async Task UpdateUserAsync_UserExists_ReturnsUserExists()
+        public async Task UpdateUserAsync_UserExists_VerifyUpdate()
         {
             // Arrange
             var user = new UserEntity
@@ -115,7 +113,7 @@ namespace Tests
         }
 
         [Test]
-        public async Task DeleteRecordAsync_UserFound_DeletesUser()
+        public async Task DeleteRecordAsync_UserExists_VerifyDelete()
         {
             // Arrange
             var user = new UserEntity
