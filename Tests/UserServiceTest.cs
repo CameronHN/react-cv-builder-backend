@@ -21,7 +21,7 @@ public class UserServiceTest
     }
 
     [Test]
-    public async Task AddUserAsync_UserProvided_ShouldCallRepository()
+    public async Task AddUserAsync_ValidUser_VerifyUserAdded()
     {
         // Arrange
         // Creating a user entity with valid data
@@ -37,7 +37,7 @@ public class UserServiceTest
     }
 
     [Test]
-    public void AddUserAsync_InvalidEmailProvided_ShouldThrowValidationException()
+    public void AddUserAsync_InvalidEmail_CatchEmailValidation()
     {
         // Arrange
         // Creating a user entity with an invalid email address
@@ -80,7 +80,7 @@ public class UserServiceTest
     }
 
     [Test]
-    public async Task GetUserByIdAsync_ValidIdProvided_ReturnsCorrectUser()
+    public async Task GetUserByIdAsync_UserExists_ReturnsUser()
     {
         // Arrange
         // Creating a user entity
@@ -99,7 +99,7 @@ public class UserServiceTest
     }
 
     [Test]
-    public async Task UpdateUserAsync_UserExists_UpdatesUser()
+    public async Task UpdateUserAsync_UserExists_VerifyUpdate()
     {
         // Arrange
         // Creating a user entity
@@ -119,7 +119,7 @@ public class UserServiceTest
     }
 
     [Test]
-    public async Task DeleteUserAsync_UserExists_DeletesUser()
+    public async Task DeleteUserAsync_UserExists_VerifyDelete()
     {
         // Arrange
         // Mocking the repository to return true when delete is called with ID 1
