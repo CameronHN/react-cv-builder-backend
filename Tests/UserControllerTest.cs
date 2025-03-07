@@ -26,7 +26,7 @@ public class UserControllerTest
     // =================================
 
     [Test]
-    public async Task AddUser_ValidUserProvided_ReturnsOkResult()
+    public async Task AddUser_ValidUser_ReturnsOkResult()
     {
         // Arrange
         var user = new UserEntity
@@ -52,7 +52,7 @@ public class UserControllerTest
     }
 
     [Test]
-    public async Task AddUser_NullProvided_ReturnsBadRequest()
+    public async Task AddUser_NullUser_ReturnsBadRequest()
     {
         // Act
         var result = await _userController.AddUser(null);
@@ -69,7 +69,7 @@ public class UserControllerTest
     // =================================
 
     [Test]
-    public async Task GetUser_UserProvided_ReturnsOkResult()
+    public async Task GetUser_UserExists_ReturnsOkResult()
     {
         // Arrange
         var user = new UserEntity
@@ -92,7 +92,7 @@ public class UserControllerTest
     }
 
     [Test]
-    public async Task GetUser_InvalidUserIdProvided_ReturnsNotFound()
+    public async Task GetUser_UserNotExists_ReturnsNotFound()
     {
         // Arrange
         _mockUserService.Setup(x => x.GetUserByIdAsync(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
@@ -111,7 +111,7 @@ public class UserControllerTest
     // =================================
 
     [Test]
-    public async Task GetUsers_UsersProvided_ReturnOk()
+    public async Task GetUsers_Users_ReturnOk()
     {
         // Arrange
         var users = new List<UserEntity>
@@ -138,7 +138,7 @@ public class UserControllerTest
     // =================================
 
     [Test]
-    public async Task UpdateUser_UserProvided_ReturnsOk()
+    public async Task UpdateUser_UserExists_ReturnsOk()
     {
         // Arrange
         var userDto = new UserUpdateDto { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com" };
@@ -157,7 +157,7 @@ public class UserControllerTest
     }
 
     [Test]
-    public async Task UpdateUser_IdDoesNotMatch_ReturnsBadRequest()
+    public async Task UpdateUser_IdNotMatches_ReturnsBadRequest()
     {
         // Arrange
         var userDto = new UserUpdateDto { Id = 2, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com" };
@@ -177,7 +177,7 @@ public class UserControllerTest
     // =================================
 
     [Test]
-    public async Task DeleteUser_ValidIdProvided_ReturnsOkResult()
+    public async Task DeleteUser_UserExists_ReturnsOkResult()
     {
         // Arrange
         var userId = 1;
@@ -196,7 +196,7 @@ public class UserControllerTest
     }
 
     [Test]
-    public async Task DeleteUser_InvalidIdProvided_ReturnsNotFound()
+    public async Task DeleteUser_UserNotExists_ReturnsNotFound()
     {
         // Arrange
         _mockUserService.Setup(x => x.DeleteUserAsync(It.IsAny<int>()))
