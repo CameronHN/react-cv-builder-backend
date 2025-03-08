@@ -21,6 +21,13 @@ public class UserControllerTest
         _userController = new UserController(_mockUserService.Object);
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _mockUserService = null!;
+        _userController = null!;
+    }
+
     // =================================
     // ======= CREATE USER TESTS =======
     // =================================
@@ -54,8 +61,11 @@ public class UserControllerTest
     [Test]
     public async Task AddUser_NullUser_ReturnsBadRequest()
     {
+        // Arrange
+        var nullUser = (UserEntity)null;
+
         // Act
-        var result = await _userController.AddUser(null);
+        var result = await _userController.AddUser(nullUser);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>()
@@ -87,7 +97,9 @@ public class UserControllerTest
 
         // Assert
         result.Result.Should().BeOfType<OkObjectResult>().Which.StatusCode.Should().Be(200);
+
         result.Result.As<OkObjectResult>().Value.Should().Be(user);
+
         _mockUserService.Verify(service => service.GetUserByIdAsync(user.Id), Times.Once);
     }
 
@@ -104,6 +116,8 @@ public class UserControllerTest
         result.Result.Should().BeOfType<NotFoundObjectResult>().Which.StatusCode.Should().Be(404);
 
         result.Result.As<NotFoundObjectResult>().Value.Should().BeEquivalentTo(new { message = "User with the Id:99 not found." });
+
+        _mockUserService.Verify(service => service.GetUserByIdAsync(99), Times.Once);
     }
 
     // =================================
@@ -115,10 +129,10 @@ public class UserControllerTest
     {
         // Arrange
         var users = new List<UserEntity>
-            {
-                new UserEntity { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com" },
-                new UserEntity { Id = 2, FirstName = "Jane", LastName = "Doe", Email = "jane.doe@example.com" }
-            };
+        {
+            new UserEntity { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com" },
+            new UserEntity { Id = 2, FirstName = "Jane", LastName = "Doe", Email = "jane.doe@example.com" }
+        };
 
         _mockUserService.Setup(x => x.GetAllAsync()).ReturnsAsync(users);
 
@@ -161,6 +175,7 @@ public class UserControllerTest
     {
         // Arrange
         var userDto = new UserUpdateDto { Id = 2, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com" };
+
         var differentId = userDto.Id + 1;
 
         // Act
@@ -199,8 +214,7 @@ public class UserControllerTest
     public async Task DeleteUser_UserNotExists_ReturnsNotFound()
     {
         // Arrange
-        _mockUserService.Setup(x => x.DeleteUserAsync(It.IsAny<int>()))
-                        .ThrowsAsync(new KeyNotFoundException());
+        _mockUserService.Setup(x => x.DeleteUserAsync(It.IsAny<int>())).ThrowsAsync(new KeyNotFoundException());
 
         // Act
         var result = await _userController.DeleteUser(99);
