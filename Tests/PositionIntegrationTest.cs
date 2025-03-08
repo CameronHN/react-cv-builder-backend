@@ -5,6 +5,7 @@ using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests;
@@ -17,7 +18,7 @@ public class PositionIntegrationTest
     private WebApplicationFactory<Program> _factory;
 
     [SetUp]
-    public void OneTimeSetUp()
+    public void SetUp()
     {
 
         var options = new DbContextOptionsBuilder<DataContext>()
@@ -31,7 +32,7 @@ public class PositionIntegrationTest
                 {
                     builder.ConfigureServices(services =>
                     {
-                        var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<DataContext>));
+                        var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDbContextOptionsConfiguration<DataContext>));
                         if (descriptor != null)
                         {
                             services.Remove(descriptor);
@@ -51,13 +52,12 @@ public class PositionIntegrationTest
     }
 
     [TearDown]
-    public void OneTimeTearDown()
+    public void TearDown()
     {
         _context.Database.EnsureDeleted();
         _context.Dispose();
         _factory.Dispose();
-        // Reset repository
-        _positionRepository = null;
+        _positionRepository = null; // Reset repository
     }
 
     [Test]
@@ -68,11 +68,11 @@ public class PositionIntegrationTest
 
         var positions = new List<PositionEntity>
             {
-                new PositionEntity { Id = 1, UserId = 1, Role = "Developer", StartDate="2022-01-01", EndDate="2022-01-31" },
-                new PositionEntity { Id = 2, UserId = 1, Role = "Tester", StartDate="2023-01-01", EndDate="2024-01-01"},
-                new PositionEntity { Id = 3, UserId = 1, Role = "Developer", StartDate="2022-01-01", EndDate="2022-01-31" },
-                new PositionEntity { Id = 4, UserId = userId, Role = "Tester", StartDate="2023-01-01", EndDate="2024-01-01"},
-                new PositionEntity { Id = 5, UserId = userId, Role = "Tester", StartDate="2023-01-01", EndDate="2024-01-01"}
+                new PositionEntity { Id = 1, UserId = 1, Role = "Developer", StartDate = "2022-01-01", EndDate = "2022-01-31" },
+                new PositionEntity { Id = 2, UserId = 1, Role = "Tester", StartDate = "2023-01-01", EndDate = "2024-01-01"},
+                new PositionEntity { Id = 3, UserId = 1, Role = "Developer", StartDate = "2022-01-01", EndDate = "2022-01-31" },
+                new PositionEntity { Id = 4, UserId = userId, Role = "Tester", StartDate = "2023-01-01", EndDate = "2024-01-01"},
+                new PositionEntity { Id = 5, UserId = userId, Role = "Tester", StartDate = "2023-01-01", EndDate = "2024-01-01"}
             };
 
         _context.Positions.AddRange(positions);
@@ -83,6 +83,7 @@ public class PositionIntegrationTest
 
         // Assert
         result.Should().NotBeNull();
+
         result.Count.Should().Be(2);
     }
 
@@ -94,9 +95,9 @@ public class PositionIntegrationTest
 
         var positions = new List<PositionEntity>
             {
-                new PositionEntity { Id = 1, UserId = 1, Role = "Developer", StartDate="2022-01-01", EndDate="2022-01-31" },
-                new PositionEntity { Id = 2, UserId = 1, Role = "Tester", StartDate="2023-01-01", EndDate="2024-01-01"},
-                new PositionEntity { Id = 3, UserId = 1, Role = "Developer", StartDate="2022-01-01", EndDate="2022-01-31" }
+                new PositionEntity { Id = 1, UserId = 1, Role = "Developer", StartDate = "2022-01-01", EndDate = "2022-01-31" },
+                new PositionEntity { Id = 2, UserId = 1, Role = "Tester", StartDate = "2023-01-01", EndDate = "2024-01-01"},
+                new PositionEntity { Id = 3, UserId = 1, Role = "Developer", StartDate = "2022-01-01", EndDate = "2022-01-31" }
             };
 
         _context.Positions.AddRange(positions);
@@ -107,6 +108,7 @@ public class PositionIntegrationTest
 
         // Assert
         result.Should().BeEmpty();
+
         result.Count.Should().Be(0);
     }
 
@@ -118,14 +120,15 @@ public class PositionIntegrationTest
 
         var positions = new List<PositionEntity>
             {
-                new PositionEntity { Id = 1, UserId = 1, Role = "Software Developer", StartDate="2022-01-01", EndDate="2022-01-31" },
-                new PositionEntity { Id = 2, UserId = 1, Role = "Tester", StartDate="2023-01-01", EndDate="2024-01-01"},
-                new PositionEntity { Id = 3, UserId = 1, Role = "Mobile app developer", StartDate="2022-01-01", EndDate="2022-01-31" },
-                new PositionEntity { Id = 4, UserId = 2, Role = "Tester", StartDate="2023-01-01", EndDate="2024-01-01"},
-                new PositionEntity { Id = 5, UserId = 2, Role = "Tester", StartDate="2023-01-01", EndDate="2024-01-01"}
+                new PositionEntity { Id = 1, UserId = 1, Role = "Software Developer", StartDate = "2022-01-01", EndDate = "2022-01-31" },
+                new PositionEntity { Id = 2, UserId = 1, Role = "Tester", StartDate = "2023-01-01", EndDate = "2024-01-01"},
+                new PositionEntity { Id = 3, UserId = 1, Role = "Mobile app developer", StartDate = "2022-01-01", EndDate = "2022-01-31" },
+                new PositionEntity { Id = 4, UserId = 2, Role = "Tester", StartDate = "2023-01-01", EndDate = "2024-01-01"},
+                new PositionEntity { Id = 5, UserId = 2, Role = "Tester", StartDate = "2023-01-01", EndDate = "2024-01-01"}
             };
 
         _context.Positions.AddRange(positions);
+
         await _context.SaveChangesAsync();
 
         // Act
@@ -133,7 +136,9 @@ public class PositionIntegrationTest
 
         // Assert
         result.Should().NotBeNull();
+
         result.Count.Should().Be(2);
+
         foreach (var item in result)
             Console.WriteLine($"Id: {item.Id}, Role: {item.Role}");
     }
@@ -146,14 +151,15 @@ public class PositionIntegrationTest
 
         var positions = new List<PositionEntity>
             {
-                new PositionEntity { Id = 1, UserId = 1, Role = "Software Developer", StartDate="2022-01-01", EndDate="2022-01-31" },
-                new PositionEntity { Id = 2, UserId = 1, Role = "Tester", StartDate="2023-01-01", EndDate="2024-01-01"},
-                new PositionEntity { Id = 3, UserId = 1, Role = "Mobile app developer", StartDate="2022-01-01", EndDate="2022-01-31" },
-                new PositionEntity { Id = 4, UserId = 2, Role = "Tester", StartDate="2023-01-01", EndDate="2024-01-01"},
-                new PositionEntity { Id = 5, UserId = 2, Role = "Tester", StartDate="2023-01-01", EndDate="2024-01-01"}
+                new PositionEntity { Id = 1, UserId = 1, Role = "Software Developer", StartDate = "2022-01-01", EndDate = "2022-01-31" },
+                new PositionEntity { Id = 2, UserId = 1, Role = "Tester", StartDate = "2023-01-01", EndDate = "2024-01-01"},
+                new PositionEntity { Id = 3, UserId = 1, Role = "Mobile app developer", StartDate = "2022-01-01", EndDate = "2022-01-31" },
+                new PositionEntity { Id = 4, UserId = 2, Role = "Tester", StartDate = "2023-01-01", EndDate = "2024-01-01"},
+                new PositionEntity { Id = 5, UserId = 2, Role = "Tester", StartDate = "2023-01-01", EndDate = "2024-01-01"}
             };
 
         _context.Positions.AddRange(positions);
+
         await _context.SaveChangesAsync();
 
         // Act
@@ -161,7 +167,9 @@ public class PositionIntegrationTest
 
         // Assert
         result.Should().BeEmpty();
+
         result.Should().NotBeNull();
+
         result.Count.Should().Be(0);
     }
 }
