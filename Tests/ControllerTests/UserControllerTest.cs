@@ -6,7 +6,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
-namespace Tests;
+namespace Tests.ControllerTests;
 
 [TestFixture]
 public class UserControllerTest

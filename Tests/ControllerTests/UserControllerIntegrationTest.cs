@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Text;
 
-namespace Tests;
+namespace Tests.ControllerTests;
 
 [TestFixture]
 public class UserControllerIntegrationTest

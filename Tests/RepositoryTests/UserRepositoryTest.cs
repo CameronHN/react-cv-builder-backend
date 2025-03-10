@@ -5,7 +5,7 @@ using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 
-namespace Tests
+namespace Tests.RepositoryTests
 {
     [TestFixture]
     public class UserRepositoryTest

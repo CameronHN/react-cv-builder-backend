@@ -6,7 +6,7 @@ using FluentAssertions;
 using Moq;
 using System.ComponentModel.DataAnnotations;
 
-namespace Tests;
+namespace Tests.ServiceTests;
 
 [TestFixture]
 public class UserServiceTest

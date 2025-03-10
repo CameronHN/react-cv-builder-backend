@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Tests;
+namespace Tests.RepositoryTests;
 
 [TestFixture]
 public class PositionIntegrationTest
