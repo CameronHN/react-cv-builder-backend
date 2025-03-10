@@ -34,12 +34,26 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IPositionRepository, PositionRepository>();
 builder.Services.AddScoped<IPositionResponsibilityRepository, PositionResponsibilityRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddScoped<IUserSkillRepository, UserSkillRepository>();
+builder.Services.AddScoped<ISkillTypeRepository, SkillTypeRepository>();
+builder.Services.AddScoped<IEducationRepository, EducationRepository>();
 
 // Register services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPositionService, PositionService>();
 builder.Services.AddScoped<IPositionResponsibilityService, PositionResponsibilityService>();
+builder.Services.AddScoped<IUserSkillService, UserSkillService>();
+builder.Services.AddScoped<ISkillTypeService, SkillTypeService>();
+builder.Services.AddScoped<IEducationService, EducationService>();
+
+// Enable CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 
 var app = builder.Build();
 
@@ -51,6 +65,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowSpecificOrigin");
 
 app.UseAuthorization();
 
