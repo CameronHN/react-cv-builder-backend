@@ -3,6 +3,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250309181351_SeedSkillData")]
+    partial class SeedSkillData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,41 +64,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Education");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            EndDate = "2018-12-31",
-                            FieldOfStudy = "Comp Sci",
-                            Institution = "Univ of Example",
-                            Major = "Software Eng",
-                            Qualification = "BSc",
-                            StartDate = "2015-01-01",
-                            UserId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            EndDate = "2020-12-31",
-                            FieldOfStudy = "IT",
-                            Institution = "Example Inst of Tech",
-                            Major = "Data Science",
-                            Qualification = "MSc",
-                            StartDate = "2019-01-01",
-                            UserId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EndDate = "2020-12-31",
-                            FieldOfStudy = "IT",
-                            Institution = "Example Inst of Tech",
-                            Major = "Computer Science",
-                            Qualification = "ITD",
-                            StartDate = "2019-01-01",
-                            UserId = 1
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.HobbyEntity", b =>

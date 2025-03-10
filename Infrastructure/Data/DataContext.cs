@@ -52,6 +52,33 @@ namespace Infrastructure.Data
                 .HasForeignKey(pr => pr.PositionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Configuring UserSkillEntity relationship
+            modelBuilder.Entity<UserSkillEntity>()
+                .HasOne(us => us.User)
+                .WithMany(u => u.UserSkills)
+                .HasForeignKey(us => us.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserSkillEntity>()
+                .HasOne(us => us.Skill)
+                .WithMany(s => s.UserSkills)
+                .HasForeignKey(us => us.SkillId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configuring SkillEntity relationship
+            modelBuilder.Entity<SkillEntity>()
+                .HasOne(s => s.SkillType)
+                .WithMany(st => st.Skills)
+                .HasForeignKey(s => s.SkillTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configuring EducationEntity relationship with UserEntity
+            modelBuilder.Entity<EducationEntity>()
+                .HasOne(e => e.User)
+                .WithMany(u => u.Educations)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             // ==========================
             // ======= Seed Data ========
             // ==========================
@@ -176,15 +203,85 @@ namespace Infrastructure.Data
                 new PositionResponsibilityEntity { Id = 29, PositionId = 6, Responsibility = "Present research findings" },
                 new PositionResponsibilityEntity { Id = 30, PositionId = 6, Responsibility = "Publish research papers" }
             );
+
+            modelBuilder.Entity<SkillTypeEntity>().HasData(
+                new SkillTypeEntity { Id = 1, SkillTypeName = "Programming Language" },
+                new SkillTypeEntity { Id = 2, SkillTypeName = "Framework" },
+                new SkillTypeEntity { Id = 3, SkillTypeName = "Database" },
+                new SkillTypeEntity { Id = 4, SkillTypeName = "Tool" }
+            );
+
+            modelBuilder.Entity<SkillEntity>().HasData(
+                new SkillEntity { Id = 1, SkillName = "C#", SkillTypeId = 1 },
+                new SkillEntity { Id = 2, SkillName = "JavaScript", SkillTypeId = 1 },
+                new SkillEntity { Id = 3, SkillName = "Python", SkillTypeId = 1 },
+                new SkillEntity { Id = 4, SkillName = "React", SkillTypeId = 2 },
+                new SkillEntity { Id = 5, SkillName = "Angular", SkillTypeId = 2 },
+                new SkillEntity { Id = 6, SkillName = "SQL Server", SkillTypeId = 3 },
+                new SkillEntity { Id = 7, SkillName = "MySQL", SkillTypeId = 3 },
+                new SkillEntity { Id = 8, SkillName = "Git", SkillTypeId = 4 },
+                new SkillEntity { Id = 9, SkillName = "Docker", SkillTypeId = 4 },
+                new SkillEntity { Id = 10, SkillName = "Kubernetes", SkillTypeId = 4 }
+            );
+
+            modelBuilder.Entity<UserSkillEntity>().HasData(
+                new UserSkillEntity { Id = 1, UserId = 1, SkillId = 1 },
+                new UserSkillEntity { Id = 2, UserId = 1, SkillId = 4 },
+                new UserSkillEntity { Id = 3, UserId = 2, SkillId = 2 },
+                new UserSkillEntity { Id = 4, UserId = 2, SkillId = 5 },
+                new UserSkillEntity { Id = 5, UserId = 3, SkillId = 3 },
+                new UserSkillEntity { Id = 6, UserId = 1, SkillId = 6 },
+                new UserSkillEntity { Id = 7, UserId = 1, SkillId = 7 },
+                new UserSkillEntity { Id = 8, UserId = 2, SkillId = 8 },
+                new UserSkillEntity { Id = 9, UserId = 2, SkillId = 9 },
+                new UserSkillEntity { Id = 10, UserId = 3, SkillId = 10 }
+            );
+
+            // Seed Data
+            modelBuilder.Entity<EducationEntity>().HasData(
+                new EducationEntity
+                {
+                    Id = 1,
+                    Qualification = "BSc",
+                    FieldOfStudy = "Comp Sci",
+                    Institution = "Univ of Example",
+                    StartDate = "2015-01-01",
+                    EndDate = "2018-12-31",
+                    Major = "Software Eng",
+                    UserId = 1
+                },
+                new EducationEntity
+                {
+                    Id = 2,
+                    Qualification = "MSc",
+                    FieldOfStudy = "IT",
+                    Institution = "Example Inst of Tech",
+                    StartDate = "2019-01-01",
+                    EndDate = "2020-12-31",
+                    Major = "Data Science",
+                    UserId = 1
+                },
+                new EducationEntity
+                {
+                    Id = 3,
+                    Qualification = "ITD",
+                    FieldOfStudy = "IT",
+                    Institution = "Example Inst of Tech",
+                    StartDate = "2019-01-01",
+                    EndDate = "2020-12-31",
+                    Major = "Computer Science",
+                    UserId = 1
+                }
+            );
         }
 
-        //// Override to configure the database provider
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    if (!optionsBuilder.IsConfigured)
-        //    {
-        //        optionsBuilder.UseSqlServer("Data source=(localdb)\\localdb;Initial catalog=CvDb;Trusted_Connection=True;TrustServerCertificate=True;");
-        //    }
-        //}
+        // Override to configure the database provider
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Data source=(localdb)\\localdb;Initial catalog=CvDb;Trusted_Connection=True;TrustServerCertificate=True;");
+            }
+        }
     }
 }
