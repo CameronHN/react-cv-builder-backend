@@ -12,5 +12,7 @@ namespace Domain.Entities
         [Required]
         [Column(TypeName = "varchar(50)")]
         public string SkillTypeName { get; set; } = string.Empty;
+
+        public ICollection<SkillEntity> Skills { get; set; } = new List<SkillEntity>();
     }
 }

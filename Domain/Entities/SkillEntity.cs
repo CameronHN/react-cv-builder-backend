@@ -19,5 +19,7 @@ namespace Domain.Entities
         public int SkillTypeId { get; set; }
 
         public SkillTypeEntity SkillType { get; set; } = null!;
+
+        public ICollection<UserSkillEntity> UserSkills { get; set; } = new List<UserSkillEntity>();
     }
 }
