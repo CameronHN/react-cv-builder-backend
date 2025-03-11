@@ -42,16 +42,20 @@ This project serves as the backend for a CV builder application. It is built usi
 
     `dotnet ef database update`
 
-6. **Build the project**
+    If the above command does not work, run the following command to use the last working migration:
+
+   `dotnet ef database update 20250310122635_SeedEducationDataTest2`
+
+7. **Build the project**
 
     Open the project in Visual Studio and firstly build the application.
 
     `dotnet build`
 
-7. **Test the project**
+8. **Test the project**
 
     `dotnet test`
 
-8. **Run the project**
+9. **Run the project**
 
     `dotnet run`
