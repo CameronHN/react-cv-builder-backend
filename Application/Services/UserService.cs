@@ -19,45 +19,59 @@ namespace Application.Services
             await _userRepository.AddRecordAsync(user);
         }
 
-        public async Task<IEnumerable<UserEntity>> GetAllAsync()
+        private UserDto mapToUserDto(UserEntity user)
         {
-            return await _userRepository.GetAllRecordsAsync();
+            return new UserDto
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName,
+                LastName = user.LastName,
+                Email = user.Email,
+                PhoneNumber = string.IsNullOrWhiteSpace(user.PhoneNumber.Trim()) ? "None" : user.PhoneNumber
+            };
         }
 
-        public async Task<UserEntity?> GetUserByIdAsync(int id)
+        public async Task<IEnumerable<UserDto>> GetAllAsync()
         {
-            UserEntity? user = await _userRepository.GetRecordByIdAsync(id);
-            return user == null ? throw new KeyNotFoundException() : user;
+            var users = await _userRepository.GetAllRecordsAsync();
+            return users.Select(mapToUserDto);
         }
 
-        public async Task UpdateUserAsync(UserUpdateDto userDto)
+        public async Task<UserDto> GetUserByIdAsync(int id)
         {
-            UserEntity existingUser = await _userRepository.GetRecordByIdAsync(userDto.Id) ?? throw new KeyNotFoundException();
+            UserEntity? user = await _userRepository.GetRecordByIdAsync(id) ?? throw new KeyNotFoundException();
+            return mapToUserDto(user);
+        }
+
+        public async Task UpdateUserAsync(UserUpdateDto userUpdateDto)
+        {
+            UserEntity existingUser = await _userRepository.GetRecordByIdAsync(userUpdateDto.Id) ?? throw new KeyNotFoundException();
 
             // Update only modified properties
-            if (!string.IsNullOrEmpty(userDto.FirstName))
+            if (!string.IsNullOrEmpty(userUpdateDto.FirstName))
             {
-                existingUser.FirstName = userDto.FirstName;
+                existingUser.FirstName = userUpdateDto.FirstName;
             }
 
-            if (!string.IsNullOrEmpty(userDto.MiddleName))
+            if (!string.IsNullOrEmpty(userUpdateDto.MiddleName))
             {
-                existingUser.MiddleName = userDto.MiddleName;
+                existingUser.MiddleName = userUpdateDto.MiddleName;
             }
 
-            if (!string.IsNullOrEmpty(userDto.LastName))
+            if (!string.IsNullOrEmpty(userUpdateDto.LastName))
             {
-                existingUser.LastName = userDto.LastName;
+                existingUser.LastName = userUpdateDto.LastName;
             }
 
-            if (!string.IsNullOrEmpty(userDto.Email))
+            if (!string.IsNullOrEmpty(userUpdateDto.Email))
             {
-                existingUser.Email = userDto.Email;
+                existingUser.Email = userUpdateDto.Email;
             }
 
-            if (!string.IsNullOrEmpty(userDto.PhoneNumber))
+            if (!string.IsNullOrEmpty(userUpdateDto.PhoneNumber))
             {
-                existingUser.PhoneNumber = userDto.PhoneNumber;
+                existingUser.PhoneNumber = userUpdateDto.PhoneNumber;
             }
 
             try
