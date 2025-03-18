@@ -82,7 +82,7 @@ public class UserControllerTest
     public async Task GetUser_UserExists_ReturnsOkResult()
     {
         // Arrange
-        var user = new UserEntity
+        var user = new UserDto
         {
             Id = 1,
             FirstName = "John",
@@ -128,10 +128,10 @@ public class UserControllerTest
     public async Task GetUsers_Users_ReturnOk()
     {
         // Arrange
-        var users = new List<UserEntity>
+        var users = new List<UserDto>
         {
-            new UserEntity { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com" },
-            new UserEntity { Id = 2, FirstName = "Jane", LastName = "Doe", Email = "jane.doe@example.com" }
+            new UserDto { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com" },
+            new UserDto { Id = 2, FirstName = "Jane", LastName = "Doe", Email = "jane.doe@example.com" }
         };
 
         _mockUserService.Setup(x => x.GetAllAsync()).ReturnsAsync(users);
