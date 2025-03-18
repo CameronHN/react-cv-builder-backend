@@ -42,7 +42,7 @@ namespace Domain.Entities
         public ICollection<ProfessionalStatementEntity> ProfessionalStatements { get; set; } = new List<ProfessionalStatementEntity>();
 
         public ICollection<SocialMediaEntity> SocialMedias { get; set; } = new List<SocialMediaEntity>();
-        
+
         public ICollection<HobbyEntity> Hobbies { get; set; } = new List<HobbyEntity>();
     }
 }
